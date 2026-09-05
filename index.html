@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <title>Kaniner</title>
+</head>
+
+<body class="bg-light">
+
+<div id="app" class="container py-5">
+
+    <h1 class="text-center mb-4">Kaniner</h1>
+
+    <!-- LOGIN -->
+    <div v-if="!userInfo" class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h4>Log ind</h4>
+
+            <input v-model="auth.username" class="form-control mb-2" placeholder="Brugernavn">
+            <input v-model="auth.password" type="password" class="form-control mb-2" placeholder="Password">
+
+            <button class="btn btn-primary" @click="login">Log ind</button>
+
+            <div class="text-danger mt-2">{{ authMessage }}</div>
+        </div>
+    </div>
+
+    <!-- USER INFO -->
+    <div class="mb-3 text-right" v-if="userInfo">
+        Logget ind som <b>{{ userInfo.username }}</b>
+        ({{ userInfo.role }})
+        <button class="btn btn-sm btn-secondary ml-2" @click="logout">Log ud</button>
+    </div>
+
+    <!-- LOAD -->
+    <div class="text-center mb-3">
+        <button class="btn btn-primary" @click="getRabbits">
+            Hent kaniner
+        </button>
+    </div>
+
+    <!-- FILTER + SORT  -->
+    <div class="mb-3 text-center">
+
+        <input v-model="filterText" class="form-control mb-2" placeholder="Søg efter navn">
+
+        <button class="btn btn-secondary btn-sm" @click="filterByName">
+            Søg
+        </button>
+
+        <button class="btn btn-outline-dark btn-sm" @click="resetFilter">
+            Reset
+        </button>
+
+        <div class="mt-2">
+            <button class="btn btn-outline-dark btn-sm" @click="sortByName">Sorter Navn</button>
+            <button class="btn btn-outline-dark btn-sm" @click="sortByWeightAsc">Vægt ↑</button>
+            <button class="btn btn-outline-dark btn-sm" @click="sortByWeightDesc">Vægt ↓</button>
+        </div>
+
+    </div>
+
+    <!-- LIST -->
+    <div v-if="rabbits.length" class="row">
+        <div class="col-md-4 mb-3" v-for="rabbit in rabbits" :key="rabbit.id">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">{{ rabbit.name }}</h5>
+
+                    <p class="text-muted mb-0">
+                        ID: {{ rabbit.id }} <br>
+                        Farve: {{ rabbit.color }} <br>
+                        Vægt: {{ rabbit.weight }} <br>
+                        Moder ID: {{ rabbit.motherId }}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div v-else class="text-center text-muted">
+        Ingen kaniner indlæst
+    </div>
+
+    <hr class="my-5">
+
+    <!-- ADD -->
+    <div class="card mb-4 shadow-sm" v-if="userInfo && userInfo.role === 'Admin'">
+        <div class="card-body">
+            <h4>Tilføj kanin</h4>
+
+            <input v-model="addData.name" class="form-control mb-2" placeholder="Navn">
+            <input v-model="addData.color" class="form-control mb-2" placeholder="Farve">
+            <input v-model.number="addData.weight" class="form-control mb-2" placeholder="Vægt" type="number">
+            <input v-model.number="addData.motherId" class="form-control mb-2" placeholder="Moder ID (valgfri)" type="number">
+
+            <button class="btn btn-success" @click="addRabbit">
+                Tilføj
+            </button>
+
+            <div class="text-success mt-2">{{ addMessage }}</div>
+        </div>
+    </div>
+
+    <!-- DELETE -->
+    <div class="card shadow-sm" v-if="userInfo && userInfo.role === 'Admin'">
+        <div class="card-body">
+            <h4>Slet kanin</h4>
+
+            <input v-model.number="deleteId" class="form-control mb-2" placeholder="ID">
+
+            <button class="btn btn-danger" @click="deleteRabbit">
+                Slet
+            </button>
+
+            <div class="mt-2">{{ deleteMessage }}</div>
+        </div>
+    </div>
+
+</div>
+
+<script src="index.js"></script>
+
+</body>
+</html>
